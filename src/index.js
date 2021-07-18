@@ -29,14 +29,16 @@ app.post('/users', (request, response) => {
   if (usernameAlreadyUsed)
     return response.status(400).json({ error: 'Username already used. Try another one.'});
 
-  users.push({
+  const user = {
     id:  uuidv4(),
     name,
     username,
     todos: []
-  });
+  };
 
-  return response.status(201).send();
+  users.push(user);
+
+  return response.status(201).json(user);
 });
 
 app.get('/todos', checksExistsUserAccount, (request, response) => {
@@ -74,7 +76,13 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   todo.title = title;
   todo.deadline = new Date(deadline);
 
-  return response.status(201).send();  
+  var updatedTodo = {
+    title: todo.title,
+    deadline: todo.deadline,
+    done: todo.done
+  }
+
+  return response.status(201).json(updatedTodo);  
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
@@ -87,7 +95,7 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   
   todo.done = true;
 
-  return response.status(201).send();
+  return response.status(201).json(todo);
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
@@ -100,7 +108,7 @@ app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
 
   user.todos.splice(todo, 1);
 
-  return response.status(201).send();
+  return response.status(204).send();
 });
 
 module.exports = app;
